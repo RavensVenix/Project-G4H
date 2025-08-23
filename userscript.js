@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      1.9
+// @version      2.0
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -108,28 +108,27 @@
 
 
     function isSafelinku() {
-        if (document.querySelector('img[src*="safelinku.b-cdn.net/image/Frame 25.webp"]')) {
-            return true;
-        }
-        if (window.location.hostname === "sfl.gl") {
-            return true;
-        }
+        if (document.querySelector('img[src*="safelinku.b-cdn.net/image/Frame 25.webp"]')) return true;
+        if (window.location.hostname === "sfl.gl") return true;
         return false;
     }
 
 
-    function handleSafelinku() {
-        if (!isSafelinku()) return;
-
+    function detectRateLimitSFL() {
         const rateObserver = new MutationObserver(async () => {
             const rateEl = document.querySelector('h2.text-gray-600');
             if (rateEl && rateEl.textContent.includes("rate limited")) {
-                await sleep(5000);
+                await sleep(6000);
                 window.location.reload();
                 rateObserver.disconnect();
             }
         });
         rateObserver.observe(document.documentElement, { childList: true, subtree: true });
+    }
+
+
+    function handleSafelinku() {
+        if (!isSafelinku()) return;
 
         handleElement(null, "#adblock-warning", "waitDelete", {
             mode: "once",
@@ -148,13 +147,12 @@
             text: "🔥 Telegram: @g4hmx0"
         });
 
-        clickElement(null, "#first_open_button_page_1", { mode: "once", delay: 1000 });
+        clickElement(null, "#first_open_button_page_1", { mode: "once", delay: 1500 });
         clickElement(null, "#second_open_button_page_1", { mode: "once", delay: 1000 });
-        clickElement(null, "#first_open_button_page_2", { mode: "once", delay: 1000 });
-        clickElement(null, "#go_to_link_button", { mode: "once", delay: 1000 });
+        clickElement(null, "#first_open_button_page_2", { mode: "once", delay: 1500 });
+        clickElement(null, "#go_to_link_button", { mode: "once", delay: 500 });
         clickElement(null, 'button[class*="w-fit bg-[#1A56DB]"]', { mode: "once", delay: 1000 });
     }
-
 
 
     // PLING
@@ -215,6 +213,7 @@
 
 
     // SAFELINKU
+    detectRateLimitSFL();
     handleSafelinku();
 })();
 
