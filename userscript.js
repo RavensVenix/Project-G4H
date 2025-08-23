@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      1.8
+// @version      1.9
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -25,6 +25,7 @@
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
+
 
     function handleElement(matchUrl, selector, action, options = {}) {
         if (matchUrl && !window.location.href.match(matchUrl)) return;
@@ -64,6 +65,7 @@
         observer.observe(document.documentElement, { childList: true, subtree: true });
     }
 
+
     function clickElement(matchUrl, selector, options = {}) {
         if (matchUrl && !window.location.href.match(matchUrl)) return;
 
@@ -82,9 +84,11 @@
         observer.observe(document.documentElement, { childList: true, subtree: true });
     }
 
+
     function ytmAntiAutoPause() {
         clickElement(/music.youtube.com/, 'div[class="yt-spec-touch-feedback-shape__fill"]');
     }
+
 
     function bypassPling() {
         if (window.location.href.match(/pling\.com/)) {
@@ -102,6 +106,7 @@
         clickElement(/linkvertise\.com/, 'button[class="action-box__cta-button lv-lib-button--primary lv-lib-button--lg lv-lib-button--rounded"]', { mode: "once", delay: 1000 });
     }
 
+
     function isSafelinku() {
         if (document.querySelector('img[src*="safelinku.b-cdn.net/image/Frame 25.webp"]')) {
             return true;
@@ -112,8 +117,19 @@
         return false;
     }
 
+
     function handleSafelinku() {
         if (!isSafelinku()) return;
+
+        const rateObserver = new MutationObserver(async () => {
+            const rateEl = document.querySelector('h2.text-gray-600');
+            if (rateEl && rateEl.textContent.includes("rate limited")) {
+                await sleep(5000);
+                window.location.reload();
+                rateObserver.disconnect();
+            }
+        });
+        rateObserver.observe(document.documentElement, { childList: true, subtree: true });
 
         handleElement(null, "#adblock-warning", "waitDelete", {
             mode: "once",
@@ -140,6 +156,7 @@
     }
 
 
+
     // PLING
     if (window.location.href.match(/pling\.com/)) {
         handleElement(/pling\.com/, 'h1[class="empty-title"]', "addText", {
@@ -155,6 +172,7 @@
     if (window.location.href.match(/music\.youtube\.com/)) {
         ytmAntiAutoPause();
     }
+
 
     // LINKVERTISE
     if (window.location.href.match(/linkvertise\.com/)) {
