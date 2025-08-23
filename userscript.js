@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      1.7
+// @version      1.8
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -11,6 +11,13 @@
 // @downloadURL  https://raw.githubusercontent.com/RavensVenix/Project-G4H/main/userscript.js
 // @updateURL    https://raw.githubusercontent.com/RavensVenix/Project-G4H/main/meta.js
 // ==/UserScript==
+// ========== EH TYTYD DONATE NAPA ANJINK =========
+// PROJECT SIH PROJECT TAPI KAN GW JUGA BUTUH DUID :'v
+// BTW, JANGAN LUPA JOIN @g4hmx0 DI TELEGRAM YAAA!!!
+// KALAU MAU BELIIN KOPI BOLEH PAK LANGSUNG KE SAWERIA WKKWWKKW
+// Saweria: saweria.co/ywunyun
+// THANKS YAA!! <3
+// ================================================
 
 (function() {
     'use strict';
