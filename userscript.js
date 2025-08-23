@@ -9,7 +9,7 @@
 // @grant        none
 // @icon         https://i.ibb.co.com/V03s1cWw/Project-G4-H-Logo-modified.png
 // @downloadURL  https://raw.githubusercontent.com/RavensVenix/Project-G4H/main/userscript.js
-// @updateURL    https://raw.githubusercontent.com/RavensVenix/Project-G4H/main/meta.js
+// @updateURL    https://raw.githubusercontent.com/RavensVenix/Project-G4H/refs/heads/main/meta.js
 // ==/UserScript==
 // ========== EH TYTYD DONATE NAPA ANJINK =========
 // PROJECT SIH PROJECT TAPI KAN GW JUGA BUTUH DUID :'v
