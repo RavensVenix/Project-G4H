@@ -8,6 +8,8 @@
 // @match        *://*/*
 // @grant        none
 // @icon         https://i.ibb.co.com/V03s1cWw/Project-G4-H-Logo-modified.png
+// @downloadURL  https://github.com/RavensVenix/Project-G4H/raw/refs/heads/main/userscript.js
+// @updateURL    https://github.com/RavensVenix/Project-G4H/raw/refs/heads/main/userscript.js
 // ==/UserScript==
 
 (function() {
