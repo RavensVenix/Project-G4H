@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      1.6
+// @version      1.7
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
 // @match        *://*/*
 // @grant        none
 // @icon         https://i.ibb.co.com/V03s1cWw/Project-G4-H-Logo-modified.png
-// @downloadURL  https://raw.githubusercontent.com/RavensVenix/Project-G4H/refs/heads/main/userscript.js
-// @updateURL    https://raw.githubusercontent.com/RavensVenix/Project-G4H/refs/heads/main/userscript.js
+// @downloadURL  https://raw.githubusercontent.com/RavensVenix/Project-G4H/main/userscript.js
+// @updateURL    https://raw.githubusercontent.com/RavensVenix/Project-G4H/main/userscript.js
 // ==/UserScript==
 
 (function() {
