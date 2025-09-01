@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      3.2
+// @version      3.3
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -156,89 +156,41 @@
     }
 
     function keygenaa() {
-        async function duarAstaga(url, opts = {}) {
-            if (typeof GM_xmlhttpRequest !== "undefined") {
-                return new Promise((resolve, reject) => {
-                    GM_xmlhttpRequest({
-                        method: opts.method || "GET",
-                        url: url,
-                        data: opts.body || null,
-                        headers: opts.headers || {},
-                        redirect: "manual",
-                        onload: res => resolve({
-                            status: res.status,
-                            headers: res.responseHeaders,
-                            text: () => Promise.resolve(res.responseText),
-                            location: (() => {
-                                let match = res.responseHeaders.match(/location:\s*(.*)/i);
-                                return match ? match[1].trim() : null;
-                            })(),
-                            url: res.finalUrl
-                        }),
-                        onerror: err => reject(err)
-                    });
+        function req(url, method = "GET", data = null) {
+            return new Promise((resolve, reject) => {
+                GM_xmlhttpRequest({
+                    method,
+                    url,
+                    data,
+                    redirect: "manual",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                        "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"
+                    },
+                    onload: res => resolve(res),
+                    onerror: err => reject(err)
                 });
-            } else {
-                const res = await fetch(url, {
-                    method: opts.method || "GET",
-                    headers: opts.headers || {},
-                    body: opts.body || null,
-                    redirect: "manual"
-                });
-                return {
-                    status: res.status,
-                    headers: res.headers,
-                    text: () => res.text(),
-                    location: res.headers.get("location"),
-                    url: res.url
-                };
-            }
+            });
         }
 
         async function generateArrow() {
             try {
-                const res1 = await duarAstaga("https://arrowmodz.xyz/gen-key/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36",
-                        "Referer": "https://arrowmodz.xyz/gen-key/",
-                        "Cookie": "PHPSESSID=0274796846c3139e5c18e184be38d467",
-                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-                        "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"
-                    },
-                    body: "server=2"
-                });
-
-                const loc1 = res1.location;
+                const res1 = await req("https://arrowmodz.xyz/gen-key/", "POST", "server=2");
+                const loc1 = res1.responseHeaders.match(/location:\s*(.*)/i);
                 if (!loc1) return null;
 
-                const res2 = await duarAstaga(loc1, {
-                    headers: {
-                        "User-Agent": "Mozilla/5.0",
-                        "Referer": "https://arrowmodz.xyz/gen-key/",
-                        "Cookie": "PHPSESSID=0274796846c3139e5c18e184be38d467"
-                    }
-                });
+                const res2 = await req(loc1[1].trim());
+                const loc2 = res2.responseHeaders.match(/location:\s*(.*)/i);
+                if (!loc2) return null;
 
-                const loc2 = res2.location;
-                if (!loc2 || !loc2.includes("url=")) return null;
+                const finalUrl = decodeURIComponent(loc2[1].trim().split("url=").pop());
+                const finalRes = await req(finalUrl);
 
-                const finalUrl = decodeURIComponent(loc2.split("url=").pop());
-
-                const finalRes = await duarAstaga(finalUrl, {
-                    headers: {
-                        "User-Agent": "Mozilla/5.0",
-                        "Referer": "https://arrowmodz.xyz/gen-key/",
-                        "Cookie": "PHPSESSID=0274796846c3139e5c18e184be38d467"
-                    }
-                });
-
-                const html = await finalRes.text();
-                const match = html.match(/id="key"[^>]*value="([^"]+)"/);
+                const match = finalRes.responseText.match(/id="key"[^>]*value="([^"]+)"/);
                 return match ? match[1] : null;
-            } catch (error) {
-                console.error("Error generating arrow key:", error);
+            } catch (e) {
+                console.error("generateArrow error:", e);
                 return null;
             }
         }
