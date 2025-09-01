@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      3.0
+// @version      3.1
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
 // @match        *://*/*
 // @grant        GM_setClipboard
+// @grant        GM_xmlhttpRequest
 // @icon         https://i.ibb.co.com/V03s1cWw/Project-G4-H-Logo-modified.png
 // @downloadURL  https://raw.githubusercontent.com/RavensVenix/Project-G4H/main/userscript.js
 // @updateURL    https://raw.githubusercontent.com/RavensVenix/Project-G4H/refs/heads/main/meta.js
@@ -155,6 +156,72 @@
     }
 
     function keygenaa() {
+        const generateArrow = async () => {
+            try {
+                function duarAstaga(url, opts = {}) {
+                    return new Promise((resolve, reject) => {
+                        GM_xmlhttpRequest({
+                            method: opts.method || "GET",
+                            url: url,
+                            data: opts.body || null,
+                            headers: opts.headers || {},
+                            responseType: "text",
+                            redirect: "manual",
+                            onload: res => resolve(res),
+                            onerror: err => reject(err)
+                        });
+                    });
+                }
+                const res1 = await duarAstaga("https://arrowmodz.xyz/gen-key/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36",
+                        "Referer": "https://arrowmodz.xyz/gen-key/",
+                        "Cookie": "PHPSESSID=0274796846c3139e5c18e184be38d467",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                        "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"
+                    },
+                    body: "server=2",
+                    redirect: 'manual'
+                });
+
+                const location1 = res1.responseHeaders.match(/location:\s*(.*)/i);
+                if (!location1) return null;
+                const loc1 = location1[1].trim();
+
+                const res2 = await duarAstaga(loc1, {
+                    headers: {
+                        "User-Agent": "Mozilla/5.0",
+                        "Referer": "https://arrowmodz.xyz/gen-key/",
+                        "Cookie": "PHPSESSID=0274796846c3139e5c18e184be38d467"
+                    }
+                });
+
+                const location2 = res2.responseHeaders.match(/location:\s*(.*)/i);
+                if (!location2) return null;
+                const loc2 = location2[1].trim();
+
+                if (!loc2.includes("url=")) return null;
+
+                const finalUrl = decodeURIComponent(loc2.split("url=").pop());
+
+                const finalRes = await duarAstaga(finalUrl, {
+                    headers: {
+                        "User-Agent": "Mozilla/5.0",
+                        "Referer": "https://arrowmodz.xyz/gen-key/",
+                        "Cookie": "PHPSESSID=0274796846c3139e5c18e184be38d467"
+                    }
+                });
+
+                const match = finalRes.responseText.match(/id="key"[^>]*value="([^"]+)"/);
+                return match ? match[1] : null;
+            } catch (error) {
+                console.error('Error generating arrow key:', error);
+                return null;
+            }
+        };
+
         const baseURL = window.location.origin;
         const style = document.createElement('style');
         style.textContent = `.gen-btn {
@@ -236,6 +303,10 @@
 
         btn.addEventListener('click', async () => {
             try {
+                if (baseURL == "https://arrowmodz.xyz") {
+                    const ewe = await generateArrow();
+                    return showKeyModal(ewe);
+                }
                 let res;
                 const token = await getSessionToken();
                 if (!token) return alert('Token gada cuy, coba refresh :v');
@@ -245,6 +316,8 @@
                 if (baseURL == "https://web.aachann.my.id") {
                     res = await fetch(`${baseURL}/Get-key/genkey.php?data=${encoded}`);
                 } else if (baseURL == "http://cimodkun.my.id") {
+                    res = await fetch(`${baseURL}/genkey/genkey.php?data=${encoded}`);
+                } else if (baseURL == "https://aamod.site") {
                     res = await fetch(`${baseURL}/genkey/genkey.php?data=${encoded}`);
                 }
                 const html = await res.text();
@@ -373,7 +446,7 @@
     });
 
     // KEYGEN AA & CIMOD
-    if (window.location.href.match('aachann') || window.location.href.match('aamod') || window.location.href.match('cimodkun')) {
+    if (window.location.href.match('aachann') || window.location.href.match('aamod') || window.location.href.match('cimodkun') || window.location.href.match('arrowmodz')) {
         keygenaa();
     }
 })();
