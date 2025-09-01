@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      3.3
+// @version      3.4
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -177,14 +177,17 @@
         async function generateArrow() {
             try {
                 const res1 = await req("https://arrowmodz.xyz/gen-key/", "POST", "server=2");
+                console.log(res1);
                 const loc1 = res1.responseHeaders.match(/location:\s*(.*)/i);
                 if (!loc1) return null;
 
                 const res2 = await req(loc1[1].trim());
                 const loc2 = res2.responseHeaders.match(/location:\s*(.*)/i);
+                console.log(loc2);
                 if (!loc2) return null;
 
                 const finalUrl = decodeURIComponent(loc2[1].trim().split("url=").pop());
+                console.log(finalUrl);
                 const finalRes = await req(finalUrl);
 
                 const match = finalRes.responseText.match(/id="key"[^>]*value="([^"]+)"/);
@@ -402,6 +405,7 @@
     detectRateLimitSFL();
     handleSafelinku();
 
+
     // OTAKUDESU
     handleElement(/otakudesu\./, "#iklanbawah", "delete", { mode: "once" });
     handleElement(/otakudesu\./, ".iklan", "delete", { mode: "always" });
@@ -418,9 +422,31 @@
         text: "🔥 Telegram: @g4hmx0"
     });
 
+
     // KEYGEN AA & CIMOD
     if (window.location.href.match('aachann') || window.location.href.match('aamod') || window.location.href.match('cimodkun') || window.location.href.match('arrowmodz')) {
         keygenaa();
     }
-})();
 
+
+    // LAYAROTAKU.CLOUD
+    handleElement(/layarotaku\./, ".kln", "delete", { mode: "always" });
+    handleElement(/layarotaku\./, 'div[class="blox mlb iDd0s-4dgu4rd"', "delete", { mode: "always" });
+    handleElement(/layarotaku\./, "#kqtdta2woo", "delete", { mode: "once" });
+    handleElement(/layarotaku\./, ".gu2xdath7", "delete", { mode: "once" });
+    handleElement(/layarotaku\./, '.announ', "addText", {
+        mode: "once",
+        position: "before",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+
+
+    // MOENIME.COM
+    handleElement(/moenime\./, "#floatads1", "delete", { mode: "always" });
+    handleElement(/moenime\./, '#site-logo', "addText", {
+        mode: "once",
+        position: "after",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+
+})();
