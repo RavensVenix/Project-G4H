@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      3.0
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
 // @match        *://*/*
-// @grant        none
+// @grant        GM_setClipboard
 // @icon         https://i.ibb.co.com/V03s1cWw/Project-G4-H-Logo-modified.png
 // @downloadURL  https://raw.githubusercontent.com/RavensVenix/Project-G4H/main/userscript.js
 // @updateURL    https://raw.githubusercontent.com/RavensVenix/Project-G4H/refs/heads/main/meta.js
@@ -154,6 +154,146 @@
         clickElement(null, 'button[class*="w-fit bg-[#1A56DB]"]', { mode: "once", delay: 1000 });
     }
 
+    function keygenaa() {
+        const baseURL = window.location.origin;
+        const style = document.createElement('style');
+        style.textContent = `.gen-btn {
+            background: linear-gradient(135deg, #2bb8e9, #0077cc);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: 0.3s;
+            z-index: 9999;
+        }
+        .gen-btn:hover {
+            background: linear-gradient(135deg, #1aa8d9, #0066bb);
+            transform: scale(1.05);
+        }
+        .gen-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .gen-content {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 12px;
+            max-width: 90%;
+            box-shadow: 0 0 25px rgba(0,0,0,0.3);
+            text-align: center;
+            font-family: sans-serif;
+        }
+        .gen-content h2 {
+            color: #2bb8e9;
+            margin-bottom: 10px;
+        }
+        .gen-key {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 15px 0;
+            color: #333;
+            font-size: 16px;
+        }
+        .gen-actions button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .gen-copy {
+            background-color: #2bb8e9;
+            color: white;
+        }
+        .gen-close {
+            background-color: #ccc;
+            color: black;
+        }`;
+
+        document.head.appendChild(style);
+
+        const btn = document.createElement('button');
+        btn.textContent = '🚀 Gen It!';
+        btn.className = 'gen-btn';
+        btn.style.position = 'fixed';
+        btn.style.bottom = '30px';
+        btn.style.right = '30px';
+
+        document.body.appendChild(btn);
+
+        btn.addEventListener('click', async () => {
+            try {
+                let res;
+                const token = await getSessionToken();
+                if (!token) return alert('Token gada cuy, coba refresh :v');
+
+                const params = "game=MLBB&token=" + token;
+                const encoded = btoa(params);
+                if (baseURL == "https://web.aachann.my.id") {
+                    res = await fetch(`${baseURL}/Get-key/genkey.php?data=${encoded}`);
+                } else if (baseURL == "http://cimodkun.my.id") {
+                    res = await fetch(`${baseURL}/genkey/genkey.php?data=${encoded}`);
+                }
+                const html = await res.text();
+                const keyMatch = html.match(/<p id="gameKey"[^>]*>(.*?)<\/p>/);
+                const key = keyMatch ? keyMatch[1] : null;
+
+                if (!key) return alert('Limit Bang, ganti VPN gih 🙏');
+
+                showKeyModal(key);
+            } catch (e) {
+                alert('Ada yang error Bang, coba cek console...');
+                console.error(e);
+            }
+        });
+
+        async function getSessionToken() {
+            let res;
+            if (baseURL == "https://web.aachann.my.id") {
+                res = await fetch(`${baseURL}/Get-key`);
+            } else {
+                res = await fetch(`${baseURL}/genkey/`);
+            }
+            const text = await res.text();
+            const match = text.match(/const sessionToken\s*=\s*"([a-f0-9]{32})"/i);
+            return match ? match[1] : null;
+        }
+
+        function showKeyModal(key) {
+            const modal = document.createElement('div');
+            modal.className = 'gen-modal';
+            modal.innerHTML = `
+        <div class="gen-content">
+            <h2>Kunci Berhasil 🔑</h2>
+            <div class="gen-key">${key}</div>
+            <div class="gen-actions">
+                <button class="gen-copy">Copy</button>
+                <button class="gen-close">Close</button>
+            </div>
+        </div>`;
+            document.body.appendChild(modal);
+            modal.querySelector('.gen-copy').onclick = () => {
+                GM_setClipboard(key);
+                alert('Key disalin!');
+            };
+            modal.querySelector('.gen-close').onclick = () => {
+                modal.remove();
+            };
+        }
+    }
 
     // PLING
     if (window.location.href.match(/pling\.com/)) {
@@ -215,5 +355,26 @@
     // SAFELINKU
     detectRateLimitSFL();
     handleSafelinku();
+
+    // OTAKUDESU
+    handleElement(/otakudesu\./, "#iklanbawah", "delete", { mode: "once" });
+    handleElement(/otakudesu\./, ".iklan", "delete", { mode: "always" });
+    handleElement(/otakudesu\./, ".iklanpost", "delete", { mode: "once" });
+    clickElement(/otakudesu\./, 'div[id="close-button2"]', { mode: "once", delay: 50 });
+    handleElement(/otakudesu\./, '.infoupdate', "addText", {
+        mode: "once",
+        position: "before",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+    handleElement(/otakudesu\./, '#venkonten', "addText", {
+        mode: "once",
+        position: "before",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+
+    // KEYGEN AA & CIMOD
+    if (window.location.href.match('aachann') || window.location.href.match('aamod') || window.location.href.match('cimodkun')) {
+        keygenaa();
+    }
 })();
 
