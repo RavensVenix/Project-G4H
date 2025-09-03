@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      3.4
+// @version      3.5
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -136,6 +136,11 @@
             delay: 3000
         });
 
+        handleElement(null, "#adblock_warning", "waitDelete", {
+            mode: "once",
+            delay: 3000
+        });
+
         handleElement(null, 'h1.text-2xl.font-bold.text-center', "addText", {
             mode: "once",
             position: "before",
@@ -148,9 +153,10 @@
             text: "🔥 Telegram: @g4hmx0"
         });
 
-        clickElement(null, "#first_open_button_page_1", { mode: "once", delay: 1500 });
-        clickElement(null, "#second_open_button_page_1", { mode: "once", delay: 1000 });
-        clickElement(null, "#first_open_button_page_2", { mode: "once", delay: 1500 });
+        clickElement(null, "a.cursor-pointer", { mode: "always", delay: 2000 });
+        clickElement(null, "#first_open_button_page_1", { mode: "once", delay: 2000 });
+        clickElement(null, "#second_open_button_page_1", { mode: "once", delay: 2000 });
+        clickElement(null, "#first_open_button_page_2", { mode: "once", delay: 2000 });
         clickElement(null, "#go_to_link_button", { mode: "once", delay: 500 });
         clickElement(null, 'button[class*="w-fit bg-[#1A56DB]"]', { mode: "once", delay: 1000 });
     }
