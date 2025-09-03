@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      3.4
+// @version      3.5
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @match        *://*/*
