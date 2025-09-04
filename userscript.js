@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      3.6
+// @version      3.7
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -67,6 +67,32 @@
     }
 
 
+    function setCSS(sitePattern, selector, property, value, { mode = "once", interval = 1000 } = {}) {
+        if (sitePattern && !window.location.href.match(sitePattern)) {
+            return false;
+        }
+
+        function apply() {
+            const elements = document.querySelectorAll(selector);
+            if (!elements.length) return false;
+
+            elements.forEach(el => {
+                el.style[property] = value;
+            });
+
+            return true;
+        }
+
+        if (mode === "once") {
+            return apply();
+        } else if (mode === "always") {
+            apply();
+            const timer = setInterval(apply, interval);
+            return () => clearInterval(timer);
+        }
+    }
+
+
     function clickElement(matchUrl, selector, options = {}) {
         if (matchUrl && !window.location.href.match(matchUrl)) return;
 
@@ -85,6 +111,7 @@
         observer.observe(document.documentElement, { childList: true, subtree: true });
     }
 
+
     function checkJWP(selector, { delay = 0, interval = 1000, timeout = 20000 } = {}) {
         const start = Date.now();
 
@@ -99,6 +126,7 @@
             }
         }, 500);
     }
+
 
     function clickJWP(selector, { delay = 0, interval = 1000 } = {}) {
         function triggerClick(el) {
@@ -146,6 +174,7 @@
         }, interval);
     }
 
+
     function ytmAntiAutoPause() {
         clickElement(/music.youtube.com/, 'div[class="yt-spec-touch-feedback-shape__fill"]');
     }
@@ -162,6 +191,7 @@
             }
         }
     }
+
 
     function bypassLinkvertise() {
         clickElement(/linkvertise\.com/, 'button[class="action-box__cta-button lv-lib-button--primary lv-lib-button--lg lv-lib-button--rounded"]', { mode: "once", delay: 1000 });
@@ -220,6 +250,7 @@
         clickElement(null, "#go_to_link_button", { mode: "once", delay: 500 });
         clickElement(null, 'button[class*="w-fit bg-[#1A56DB]"]', { mode: "once", delay: 1000 });
     }
+
 
     function keygenaa() {
         function req(url, method = "GET", data = null) {
@@ -410,13 +441,213 @@
         }
     }
 
-    // BLOCK NEW TAB
-    function blockNewTabs() {
-        const _open = window.open;
-        window.open = function(url, target, features) {
-            return null;
-        };
+
+    function manageLocalStorage(action, websiteRegex, key, value) {
+        'use strict';
+
+        if (websiteRegex) {
+            const regex = new RegExp(websiteRegex, 'i');
+            if (!regex.test(window.location.href)) {
+                return false;
+            }
+        }
+
+        try {
+            switch (action.toLowerCase()) {
+                case 'add':
+                case 'set':
+                    if (!key) {
+                        return false;
+                    }
+
+                    const stringValue = typeof value !== 'string' ? JSON.stringify(value) : value;
+                    localStorage.setItem(key, stringValue);
+                    return true;
+
+                case 'get':
+                    if (!key) {
+                        return null;
+                    }
+
+                    const getValue = localStorage.getItem(key);
+                    console.log(`[LocalStorage Manager] Get ${key} = ${getValue}`);
+                    return getValue;
+
+                case 'delete':
+                case 'remove':
+                    if (!key) {
+                        return false;
+                    }
+
+                    localStorage.removeItem(key);
+                    console.log(`[LocalStorage Manager] Deleted ${key}`);
+                    return true;
+
+                case 'clear':
+                case 'reset':
+                    localStorage.clear();
+                    return true;
+
+                case 'list':
+                case 'show':
+                    console.log('[LocalStorage Manager] All localStorage items:');
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        const value = localStorage.getItem(key);
+                        console.log(`  ${key}: ${value}`);
+                    }
+                    return Object.keys(localStorage);
+
+                case 'exists':
+                case 'check':
+                    if (!key) {
+                        return false;
+                    }
+
+                    const exists = localStorage.getItem(key) !== null;
+                    console.log(`[LocalStorage Manager] ${key} exists: ${exists}`);
+                    return exists;
+
+                default:
+                    console.error('[LocalStorage Manager] Action tidak valid:', action);
+                    console.log('Actions: add/set, get, delete/remove, clear/reset, list/show, exists/check');
+                    return false;
+            }
+
+        } catch (error) {
+            console.error('[LocalStorage Manager] Error:', error.message);
+            return false;
+        }
     }
+
+
+    function addLocStore(websiteRegex, key, value) {
+        return manageLocalStorage('add', websiteRegex, key, value);
+    }
+
+
+    function deleteLocStore(websiteRegex, key) {
+        return manageLocalStorage('delete', websiteRegex, key, null);
+    }
+
+
+    function clearLocStore(websiteRegex) {
+        return manageLocalStorage('clear', null, null, websiteRegex);
+    }
+
+
+    function getListLocStore(websiteRegex) {
+        return manageLocalStorage('list', null, null, websiteRegex);
+    }
+
+
+    function removeScript(websiteRegex, scriptPattern, options = {}) {
+        const config = {
+            removeExisting: true,
+            blockNew: true,
+            monitorInterval: 1000,
+            logRemoval: false,
+            ...options
+        };
+
+        if (websiteRegex) {
+            const regex = new RegExp(websiteRegex, 'i');
+            if (!regex.test(window.location.href)) {
+                return false;
+            }
+        }
+
+        function removeMatchingScripts() {
+            let removedCount = 0;
+
+            const scripts = document.querySelectorAll('script');
+
+            scripts.forEach(script => {
+                let shouldRemove = false;
+                const scriptContent = script.innerHTML || script.textContent || '';
+                const scriptSrc = script.src || '';
+                const scriptType = script.type || '';
+                const scriptId = script.id || '';
+                const scriptClass = script.className || '';
+
+                const combinedText = `${scriptContent} ${scriptSrc} ${scriptType} ${scriptId} ${scriptClass}`;
+
+                if (scriptPattern) {
+                    const patternRegex = new RegExp(scriptPattern, 'gi');
+                    if (patternRegex.test(combinedText)) {
+                        shouldRemove = true;
+                    }
+                }
+
+                if (shouldRemove) {
+                    if (config.logRemoval) {
+                        console.log('[Script Remover] Removing script:', {
+                            type: scriptType,
+                            src: scriptSrc,
+                            id: scriptId,
+                            class: scriptClass,
+                            contentPreview: scriptContent.substring(0, 100) + '...'
+                        });
+                    }
+
+                    script.remove();
+                    removedCount++;
+                }
+            });
+
+            return removedCount;
+        }
+
+        if (config.removeExisting) {
+            const initialRemoved = removeMatchingScripts();
+            if (config.logRemoval && initialRemoved > 0) {
+                console.log(`[Script Remover] Removed ${initialRemoved} existing scripts`);
+            }
+        }
+
+        if (config.blockNew) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1 && node.tagName === 'SCRIPT') {
+                            const scriptContent = node.innerHTML || node.textContent || '';
+                            const scriptSrc = node.src || '';
+                            const scriptType = node.type || '';
+                            const combinedText = `${scriptContent} ${scriptSrc} ${scriptType}`;
+
+                            if (scriptPattern) {
+                                const patternRegex = new RegExp(scriptPattern, 'gi');
+                                if (patternRegex.test(combinedText)) {
+                                    if (config.logRemoval) {
+                                        console.log('[Script Remover] Blocked new script:', node.src || 'inline');
+                                    }
+                                    node.remove();
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+
+            observer.observe(document, {
+                childList: true,
+                subtree: true
+            });
+
+            if (config.monitorInterval > 0) {
+                setInterval(() => {
+                    removeMatchingScripts();
+                }, config.monitorInterval);
+            }
+        }
+
+        if (config.logRemoval) {
+            console.log('[Script Remover] Function activated with pattern:', scriptPattern);
+        }
+
+        return true;
+    }
+
 
     // PLING
     if (window.location.href.match(/pling\.com/)) {
@@ -440,8 +671,6 @@
         bypassLinkvertise();
     }
 
-    // LOAD BLOCK NEW TAB
-    blockNewTabs();
 
     // ANOBOY
     handleElement(/anoboy\./, ".sidebar", "delete", { mode: "once" });
@@ -525,6 +754,7 @@
         text: "🔥 Telegram: @g4hmx0"
     });
 
+
     // DRAMASERIAL.ID
     handleElement(/dramaserial\./, ".idmuvi-topbanner", "delete", { mode: "always" });
     handleElement(/dramaserial\./, "#custom_html-2", "delete", { mode: "always" });
@@ -538,5 +768,24 @@
         position: "after",
         text: "🔥 Telegram: @g4hmx0"
     });
+
+
+    // KOMIKU || komiku.org
+    setCSS(/komiku\./, "body", "background", "grey", { mode: "always" });
+    setCSS(/komiku\./, "nav", "background", "grey", { mode: "always" });
+    setCSS(/komiku\./, ".hd2", "background", "grey", { mode: "always" });
+    setCSS(/komiku\./, "#Navbawah", "background", "grey", { mode: "always" });
+    setCSS(/komiku\./, "section.mirip", "background", "grey", { mode: "always" });
+    addLocStore(/komiku\./, "is_subscribed", "true");
+
+
+    // MANGAPLUS
+    handleElement(/mangaplus\./, ".TitleDetail-module_sub_3Gl_e", "delete", { mode: "always" });
+    handleElement(/mangaplus\./, ".Updates-module_topAd_2rtgG", "delete", { mode: "always" });
+
+
+    // KOMIKINDO
+    handleElement(/komikindo\./, ".gulai_asam_manis", "delete", { mode: 'always' });
+    removeScript(/komikindo\./, '(ads-iframe|rn_ad_native|adsystem|doubleclick|googlesyndication|amazon-adsystem)');
 
 })();
