@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      3.5
+// @version      3.6
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -85,6 +85,66 @@
         observer.observe(document.documentElement, { childList: true, subtree: true });
     }
 
+    function checkJWP(selector, { delay = 0, interval = 1000, timeout = 20000 } = {}) {
+        const start = Date.now();
+
+        const checker = setInterval(() => {
+            const videoCheck = document.querySelector("video.jw-video");
+
+            if (videoCheck) {
+                clearInterval(checker);
+                clickJWP(selector, { delay, interval });
+            } else if (Date.now() - start >= timeout) {
+                clearInterval(checker);
+            }
+        }, 500);
+    }
+
+    function clickJWP(selector, { delay = 0, interval = 1000 } = {}) {
+        function triggerClick(el) {
+            if (!el) return false;
+
+            setTimeout(() => {
+                el.click();
+
+                ["mouseover", "mousedown", "mouseup", "click"].forEach(type => {
+                    try {
+                        el.dispatchEvent(new MouseEvent(type, {
+                            bubbles: true,
+                            cancelable: true
+                        }));
+                    } catch {}
+                });
+
+                ["keydown", "keyup"].forEach(type => {
+                    try {
+                        el.dispatchEvent(new KeyboardEvent(type, {
+                            bubbles: true,
+                            cancelable: true,
+                            key: "Enter",
+                            code: "Enter",
+                            keyCode: 13,
+                            which: 13
+                        }));
+                    } catch {}
+                });
+            }, delay);
+
+            return true;
+        }
+
+        const observer = new MutationObserver(() => {
+            const el = document.querySelector(selector);
+            if (el) triggerClick(el);
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        setInterval(() => {
+            const el = document.querySelector(selector);
+            if (el) triggerClick(el);
+        }, interval);
+    }
 
     function ytmAntiAutoPause() {
         clickElement(/music.youtube.com/, 'div[class="yt-spec-touch-feedback-shape__fill"]');
@@ -350,6 +410,14 @@
         }
     }
 
+    // BLOCK NEW TAB
+    function blockNewTabs() {
+        const _open = window.open;
+        window.open = function(url, target, features) {
+            return null;
+        };
+    }
+
     // PLING
     if (window.location.href.match(/pling\.com/)) {
         handleElement(/pling\.com/, 'h1[class="empty-title"]', "addText", {
@@ -372,6 +440,8 @@
         bypassLinkvertise();
     }
 
+    // LOAD BLOCK NEW TAB
+    blockNewTabs();
 
     // ANOBOY
     handleElement(/anoboy\./, ".sidebar", "delete", { mode: "once" });
@@ -450,6 +520,20 @@
     // MOENIME.COM
     handleElement(/moenime\./, "#floatads1", "delete", { mode: "always" });
     handleElement(/moenime\./, '#site-logo', "addText", {
+        mode: "once",
+        position: "after",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+
+    // DRAMASERIAL.ID
+    handleElement(/dramaserial\./, ".idmuvi-topbanner", "delete", { mode: "always" });
+    handleElement(/dramaserial\./, "#custom_html-2", "delete", { mode: "always" });
+    handleElement(/dramaserial\./, ".idmuvi-topplayer", "delete", { mode: "always" });
+    handleElement(/dramaserial\./, ".idmuvi-afterplayer", "delete", { mode: "always" });
+    clickElement(/dramaserial\./, 'button[class="mfp-close"]', { mode: "always", delay: 0 });
+    clickElement(/dramaserial\./, 'button[onclick="parentNode.remove()"]', { mode: "always", delay: 0 });
+    checkJWP('div.jw-skip.jw-reset.jw-skippable', { delay: 0, interval: 500 });
+    handleElement(/dramaserial\./, '.container', "addText", {
         mode: "once",
         position: "after",
         text: "🔥 Telegram: @g4hmx0"
