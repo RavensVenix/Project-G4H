@@ -771,6 +771,16 @@
 
 
     // KOMIKU || komiku.org
+    handleElement(/komiku\./, '#Trending_Komik', "addText", {
+        mode: "once",
+        position: "after",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+    handleElement(/komiku\./, '.cv', "addText", {
+        mode: "once",
+        position: "after",
+        text: "🔥 Telegram: @g4hmx0"
+    });
     setCSS(/komiku\./, "body", "background", "grey", { mode: "always" });
     setCSS(/komiku\./, "nav", "background", "grey", { mode: "always" });
     setCSS(/komiku\./, ".hd2", "background", "grey", { mode: "always" });
@@ -780,11 +790,31 @@
 
 
     // MANGAPLUS
+    handleElement(/mangaplus\./, '.Updates-module_header_2qZIk', "addText", {
+        mode: "once",
+        position: "after",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+    handleElement(/mangaplus\./, '.TitleDetailHeader-module_right1_1o9Bj', "addText", {
+        mode: "once",
+        position: "after",
+        text: "🔥 Telegram: @g4hmx0"
+    });
     handleElement(/mangaplus\./, ".TitleDetail-module_sub_3Gl_e", "delete", { mode: "always" });
     handleElement(/mangaplus\./, ".Updates-module_topAd_2rtgG", "delete", { mode: "always" });
 
 
     // KOMIKINDO
+    handleElement(/komikindo\./, '.home', "addText", {
+        mode: "once",
+        position: "before",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+    handleElement(/komikindo\./, '.infoanime', "addText", {
+        mode: "once",
+        position: "after",
+        text: "🔥 Telegram: @g4hmx0"
+    });
     handleElement(/komikindo\./, ".gulai_asam_manis", "delete", { mode: 'always' });
     removeScript(/komikindo\./, '(ads-iframe|rn_ad_native|adsystem|doubleclick|googlesyndication|amazon-adsystem)');
 
