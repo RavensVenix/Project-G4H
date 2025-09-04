@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      3.7
+// @version      3.8
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -817,5 +817,40 @@
     });
     handleElement(/komikindo\./, ".gulai_asam_manis", "delete", { mode: 'always' });
     removeScript(/komikindo\./, '(ads-iframe|rn_ad_native|adsystem|doubleclick|googlesyndication|amazon-adsystem)');
+
+
+    // MANHWA INDO
+    handleElement(/manhwaindo\./, ".ads-wrapper", "delete", { mode: "always" });
+    handleElement(/manhwaindo\./, "#kln-block", "delete", { mode: "always" });
+    handleElement(/manhwaindo\./, ".kln", "delete", { mode: "always" });
+    clickElement(/manhwaindo\./, 'span[id="close-teaser"]', { mode: "always", delay: 0 });
+    handleElement(/manhwaindo\./, 'div[style="position: relative; margin: auto; clear: both;"]', "delete", { mode: "always" });
+    handleElement(/manhwaindo\./, '.slider-wrapper', "addText", {
+        mode: "once",
+        position: "before",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+    handleElement(/manhwaindo\./, '.info-desc', "addText", {
+        mode: "once",
+        position: "before",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+    handleElement(/manhwaindo\./, '.allc', "addText", {
+        mode: "once",
+        position: "after",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+
+
+    // SOFTKOMIK
+    handleElement(/softkomik\./, '.header', "addText", {
+        mode: "once",
+        position: "after",
+        text: "🔥 Telegram: @g4hmx0"
+    });
+    handleElement(/softkomik\./, 'script[src="https://excavatenearbywand.com/aas/r45d/vki/2076916/tghr.js"]', "delete", { mode: "always" });
+    handleElement(/softkomik\./, "#dl-banner-300x250", "delete", { mode: "always" });
+    handleElement(/softkomik\./, "#dl-banner-728x90", "delete", { mode: "always" });
+
 
 })();
