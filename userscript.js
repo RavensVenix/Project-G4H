@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      3.8
+// @version      3.9
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -853,4 +853,20 @@
     handleElement(/softkomik\./, "#dl-banner-728x90", "delete", { mode: "always" });
 
 
+    // LK21
+    if (document.title.match("LayarKaca21") || document.title.match("LK21")) {
+        handleElement(null, '.breadcrumbs', "addText", {
+            mode: "once",
+            position: "before",
+            text: "🔥 Telegram: @g4hmx0"
+        });
+        handleElement(null, '.deskripsi-homepage', "addText", {
+            mode: "once",
+            position: "after",
+            text: "🔥 Telegram: @g4hmx0"
+        });
+        clickElement(null, 'button[onclick="parentNode.parentNode.parentNode.remove()"]', { mode: "always", delay: 0 });
+        handleElement(null, '#floating_banner_top1', "delete", { mode: "always" });
+        handleElement(null, 'a[rel="nofollow noopener"]', "delete", { mode: "always" });
+    }
 })();
