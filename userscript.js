@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      3.9
+// @version      4.0
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -388,7 +388,7 @@
                 const encoded = btoa(params);
                 if (baseURL == "https://web.aachann.my.id") {
                     res = await fetch(`${baseURL}/Get-key/genkey.php?data=${encoded}`);
-                } else if (baseURL == "http://cimodkun.my.id") {
+                } else if (baseURL == "https://cimodkun.my.id") {
                     res = await fetch(`${baseURL}/genkey/genkey.php?data=${encoded}`);
                 } else if (baseURL == "https://aamod.site") {
                     res = await fetch(`${baseURL}/genkey/genkey.php?data=${encoded}`);
