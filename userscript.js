@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      4.0
+// @version      4.1
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
 // @match        *://*/*
 // @grant        GM_setClipboard
 // @grant        GM_xmlhttpRequest
+// @grant        GM.xmlHttpRequest
 // @icon         https://i.ibb.co.com/V03s1cWw/Project-G4-H-Logo-modified.png
 // @downloadURL  https://raw.githubusercontent.com/RavensVenix/Project-G4H/main/userscript.js
 // @updateURL    https://raw.githubusercontent.com/RavensVenix/Project-G4H/refs/heads/main/meta.js
@@ -20,7 +21,7 @@
 // THANKS YAA!! <3
 // ================================================
 
-(function() {
+(async function() {
     'use strict';
 
     function sleep(ms) {
@@ -649,6 +650,61 @@
     }
 
 
+    function blockAdblockDetectorLinkDay() {
+        const observer = new MutationObserver(() => {
+            document.querySelectorAll("script").forEach(script => {
+                if (script.innerText && script.innerText.match(/ignielAdBlock/)) {
+                    script.type = "javascript/blocked";
+                    script.parentNode.removeChild(script);
+                }
+                if (script.src && script.src.match(/ignielAdBlock/)) {
+                    script.type = "javascript/blocked";
+                    script.parentNode.removeChild(script);
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+
+    function bypassCountdownTimer() {
+        const originalSetInterval = window.setInterval;
+        const originalSetTimeout = window.setTimeout;
+        const originalDate = window.Date;
+
+        let speed = 0.05;
+
+        window.setInterval = function (fn, t) {
+            return originalSetInterval(fn, Math.max(1, t * speed));
+        };
+
+        window.setTimeout = function (fn, t) {
+            return originalSetTimeout(fn, Math.max(1, t * speed));
+        };
+
+        window.Date = function (...args) {
+            if (args.length === 0) {
+                return new originalDate(originalDate.now() * speed);
+            }
+            return new originalDate(...args);
+        };
+        window.Date.prototype = originalDate.prototype;
+        window.Date.now = function () {
+            return originalDate.now() * speed;
+        };
+
+        window.changeTimerSpeed = function (factor) {
+            if (typeof factor === "number" && factor > 0) {
+                speed = factor;
+            }
+        };
+    }
+
+
     // PLING
     if (window.location.href.match(/pling\.com/)) {
         handleElement(/pling\.com/, 'h1[class="empty-title"]', "addText", {
@@ -670,6 +726,8 @@
     if (window.location.href.match(/linkvertise\.com/)) {
         bypassLinkvertise();
     }
+
+    bypassCountdownTimer();
 
 
     // ANOBOY
@@ -869,4 +927,28 @@
         handleElement(null, '#floating_banner_top1', "delete", { mode: "always" });
         handleElement(null, 'a[rel="nofollow noopener"]', "delete", { mode: "always" });
     }
+
+
+    // ZTY.PE
+    handleElement(/zty\.pe/, 'div[class="ztype-gsense ztype-gsense-300x600 ztype-gsense-right"]', "delete", { mode: "always" });
+    handleElement(/zty\.pe/, 'div[class="ztype-gsense ztype-gsense-300x600 ztype-gsense-left"]', "delete", { mode: "always" });
+
+
+    // LINKDAY.XYZ
+    if (window.location.href.match(/linkday\./)) {
+        blockAdblockDetectorLinkDay();
+        handleElement(null, 'div[class="bg-white rounded-lg h-full"]', "addText", {
+            mode: "once",
+            position: "before",
+            text: "🔥 Telegram: @g4hmx0"
+        });
+        clickElement(null, '#submit-button', { mode: "always", delay: 0 });
+    }
+    if (window.location.href.match(/aupeo\./) || window.location.href.match(/xlink\./)) {
+        console.log("Dijalankan!");
+        clickElement(null, 'button[style="background: rgb(179, 0, 6); border: 1px solid rgb(255, 255, 255); color: rgb(255, 255, 255); font-weight: 700; font-size: 17px; border-radius: 7px; padding: 7px 20px; margin: 5px; min-height: auto; min-width: 170px; line-height: 20px; vertical-align: middle; text-align: center;"]', { mode: "always", delay: 0 });
+    }
+    handleElement(/linkday\./, '#ignielAdBlock', "delete", { mode: "always" });
+
+
 })();
