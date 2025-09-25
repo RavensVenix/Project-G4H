@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Project G4H
 // @namespace    http://tampermonkey.net/
-// @version      4.1
+// @version      4.2
 // @description  Mem-bypass segala iklan, pop-up, timer, shortlink dan masih banyak lagi!
 // @author       @g4hmx0
 // @run-at       document-end
@@ -112,6 +112,27 @@
         observer.observe(document.documentElement, { childList: true, subtree: true });
     }
 
+    function clickByText(matchUrl, tag, text, options = {}) {
+        if (matchUrl && !window.location.href.match(matchUrl)) return;
+
+        const { mode = "once", delay = 1000 } = options;
+
+        const observer = new MutationObserver(async () => {
+            const el = [...document.querySelectorAll(tag)]
+            .find(e => e.innerText.trim() === text);
+
+            if (!el) return;
+
+            await sleep(delay);
+            if (document.contains(el)) {
+                el.click();
+            }
+
+            if (mode === "once") observer.disconnect();
+        });
+
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+    }
 
     function checkJWP(selector, { delay = 0, interval = 1000, timeout = 20000 } = {}) {
         const start = Date.now();
@@ -244,12 +265,10 @@
             text: "🔥 Telegram: @g4hmx0"
         });
 
-        clickElement(null, "a.cursor-pointer", { mode: "always", delay: 2000 });
-        clickElement(null, "#first_open_button_page_1", { mode: "once", delay: 2000 });
-        clickElement(null, "#second_open_button_page_1", { mode: "once", delay: 2000 });
-        clickElement(null, "#first_open_button_page_2", { mode: "once", delay: 2000 });
-        clickElement(null, "#go_to_link_button", { mode: "once", delay: 500 });
-        clickElement(null, 'button[class*="w-fit bg-[#1A56DB]"]', { mode: "once", delay: 1000 });
+        clickByText(null, "a", "Next", { mode: "once", delay: 1000 });
+        clickByText(null, "a", "Open", { mode: "always", delay: 1000 });
+        clickByText(null, "a", "Go to Link", { mode: "once", delay: 1000 });
+        clickByText(null, "button", "OPEN LINK", { mode: "once", delay: 1000 });
     }
 
 
